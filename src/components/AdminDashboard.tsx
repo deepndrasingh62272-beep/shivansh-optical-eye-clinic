@@ -1855,11 +1855,10 @@ function StoreSettingsTab() {
 export function AdminDashboard() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [tab, setTab] = useState<AdminTab>('appointments');
-  const { setCurrentPage } = useStore();
 
   const handleLogout = () => {
     setLoggedIn(false);
-    setCurrentPage('home');
+    window.location.href = '/';
   };
 
   if (!loggedIn) return <LoginScreen onLogin={() => setLoggedIn(true)} />;
@@ -1927,10 +1926,10 @@ export function AdminDashboard() {
       </div>
 
       <div className="text-center pb-8">
-        <button onClick={() => setCurrentPage('home')} className="inline-flex items-center gap-1.5 text-white/30 text-xs hover:text-[#D4AF37] transition-colors">
+        <a href="/" className="inline-flex items-center gap-1.5 text-white/30 text-xs hover:text-[#D4AF37] transition-colors">
           <ExternalLink className="w-3 h-3" />
           Back to Website
-        </button>
+        </a>
       </div>
     </div>
   );

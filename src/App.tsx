@@ -17,15 +17,27 @@ import { AboutUsSection } from '@/components/AboutUsSection';
 import { OurServicesSection } from '@/components/OurServicesSection';
 import { useProducts } from '@/hooks/useProducts';
 import type { Product } from '@/types';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 function usePathname() {
   const [path, setPath] = useState(window.location.pathname);
   
   useEffect(() => {
+    // Popstate event listener for back/forward buttons
     const handlePopState = () => setPath(window.location.pathname);
     window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+    
+    // Listen for pathname changes via history.pushState (used by navigation)
+    const originalPushState = window.history.pushState;
+    window.history.pushState = function(...args) {
+      originalPushState.apply(this, args);
+      setPath(window.location.pathname);
+    };
+    
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.history.pushState = originalPushState;
+    };
   }, []);
   
   return path;
@@ -105,21 +117,9 @@ function MainContent() {
 }
 
 function AppContent() {
-  const { searchQuery, currentPage } = useStore();
-  
-  useEffect(() => {
-    // Sync URL with store state on back button
-    const handlePopState = () => {
-      const pathname = window.location.pathname;
-      const page = pathname === '/admin' ? 'admin' : 'home';
-      // Note: setCurrentPage will be called by user interactions
-    };
-    
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
+  const pathname = usePathname();
 
-  if (currentPage === 'admin') {
+  if (pathname === '/admin') {
     return <AdminDashboard />;
   }
 
