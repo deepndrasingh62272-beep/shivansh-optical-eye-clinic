@@ -11,6 +11,7 @@ interface StoreContextValue {
   isCheckoutOpen: boolean;
   quickViewProduct: Product | null;
   searchQuery: string;
+  currentPage: 'home' | 'admin';
   addToCart: (product: Product, color?: string) => void;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
@@ -28,6 +29,7 @@ interface StoreContextValue {
   openCheckout: () => void;
   closeCheckout: () => void;
   setSearchQuery: (q: string) => void;
+  setCurrentPage: (page: 'home' | 'admin') => void;
   cartTotal: number;
   cartCount: number;
 }
@@ -44,6 +46,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState<'home' | 'admin'>(
+    window.location.pathname === '/admin' ? 'admin' : 'home'
+  );
 
   const addToCart = useCallback((product: Product, color?: string) => {
     setCart((prev) => {
@@ -110,6 +115,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const closeCheckout = useCallback(() => setIsCheckoutOpen(false), []);
   const clearCart = useCallback(() => setCart([]), []);
 
+  const handleSetCurrentPage = useCallback((page: 'home' | 'admin') => {
+    setCurrentPage(page);
+    if (page === 'admin') {
+      window.history.pushState({}, '', '/admin');
+    } else {
+      window.history.pushState({}, '', '/');
+    }
+  }, []);
+
   const cartTotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -123,6 +137,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     isCheckoutOpen,
     quickViewProduct,
     searchQuery,
+    currentPage,
     addToCart,
     removeFromCart,
     updateQuantity,
@@ -140,6 +155,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     closeCheckout,
     clearCart,
     setSearchQuery,
+    setCurrentPage: handleSetCurrentPage,
     cartTotal,
     cartCount,
   };
