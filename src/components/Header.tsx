@@ -116,7 +116,10 @@ export function Header() {
 
               {/* Admin Button */}
               <button
-                onClick={() => (window.location.href = '/admin')}
+                onClick={() => {
+                  window.history.pushState({}, '', '/admin');
+                  window.dispatchEvent(new PopStateEvent('popstate'));
+                }}
                 className="hidden sm:flex items-center gap-1.5 w-9 h-9 rounded-full text-white/60 hover:text-[#D4AF37] hover:bg-white/5 transition-all duration-300"
                 title="Owner Admin"
               >
@@ -168,7 +171,11 @@ export function Header() {
                 Book Eye Test
               </button>
               <button
-                onClick={() => (window.location.href = '/admin')}
+                onClick={() => {
+                  window.history.pushState({}, '', '/admin');
+                  window.dispatchEvent(new PopStateEvent('popstate'));
+                  setMobileMenuOpen(false);
+                }}
                 className="flex items-center justify-center gap-2 px-4 py-3 rounded-full border border-white/20 text-white/70 font-semibold"
               >
                 <Shield className="w-4 h-4" />

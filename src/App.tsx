@@ -21,11 +21,25 @@ import { useState, useEffect } from 'react';
 
 function usePathname() {
   const [path, setPath] = useState(window.location.pathname);
+  
   useEffect(() => {
-    const onChange = () => setPath(window.location.pathname);
-    window.addEventListener('popstate', onChange);
-    return () => window.removeEventListener('popstate', onChange);
+    // Popstate event listener for back/forward buttons
+    const handlePopState = () => setPath(window.location.pathname);
+    window.addEventListener('popstate', handlePopState);
+    
+    // Listen for pathname changes via history.pushState (used by navigation)
+    const originalPushState = window.history.pushState;
+    window.history.pushState = function(...args) {
+      originalPushState.apply(this, args);
+      setPath(window.location.pathname);
+    };
+    
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.history.pushState = originalPushState;
+    };
   }, []);
+  
   return path;
 }
 
